@@ -1,14 +1,14 @@
-Pipeline{
-    Agent {label 'OPENJDK-11-1'}
- Stages{
-    Stage('pull from vcs') {
+pipeline{
+    agent {label 'OPENJDK-11-1'}
+ stages{
+    stage('pull from vcs') {
         steps{
             git url: 'https://github.com/Sufiyan779/openmrs-core.git',
             branch: 'SPRINT_1_DEV'
         }
 
     }
-    Stage('build'){
+    stage('build'){
         steps{
             sh 'mvn package'
         }
