@@ -1,0 +1,68 @@
+pipeline {
+       agent { label 'OEENJDK-11-1' }
+       parameters {
+           string(name: 'MAVEN_GOAL', defaultValue: 'mvn package', description: 'To build maven')
+           choice(name: 'BRACH_TO_BUILD', choices: ['main', 'VER_1'], description: 'Choose the branch')
+                  }
+       triggers {
+           pollSCM ('* * * * *')
+                }
+       stages {
+           stage ('vcs') {
+            steps {
+              mail subject: "Build Started for Jenkins JOB $env.JOB_NAME",
+                   body: "Build Started for Jenkins JOB $env.JOB_NAME",
+                   to: 'khansufiyan779@gmail.com'
+              git url: 'https://github.com/Sufiyan779/openmrs-core.git',
+              branch: 'SPRINT_1_DEV'',
+              branch: "${params.BRACH_TO_BUILD}"
+                }
+                           }
+            stage ('artifactory') 
+			{
+             steps 
+			 {
+               rtMavenDeployer (
+                    id: "MAVEN_DEPLOYER",
+                    serverId: "JFROG_MVN",
+                    releaseRepo: "jenkins-libs-release-local",
+                    snapshotRepo: "jenkins-libs-snapshot-local"
+                )
+             }
+            }
+            stage ('Exec Maven') {
+            steps {
+                rtMavenRun (
+                    tool: "MVN_DEFAULT", // Tool name from Jenkins configuration
+                    pom: 'pom.xml',
+                    goals: 'clean install',
+                    deployerId: "MAVEN_DEPLOYER"
+                )
+            }
+        }
+         stage ('Publish build info') {
+            steps {
+                rtPublishBuildInfo (
+                    serverId: "JFROG_MVN"
+                )
+            }
+        }
+       }
+      post  {
+        always {
+            echo 'Job completed'
+            mail subject: "Build Completed for Jenkins JOB $env.JOB_NAME",
+                    body: "Build Completed for Jenkins JOB $env.JOB_NAME \n Click Here: $env.JOB_URL",
+                  to: 'khansufiyan779@gmail.com'
+        }
+        failure {
+            mail subject: "Build Failed for Jenkins JOB $env.JOB_NAME with Build ID $env.BUILD_ID",
+                  body: "Build Failed for Jenkins JOB $env.JOB_NAME",
+                  to: 'khansufiyan779@gmail.com'
+        }
+        success {
+            junit '**/surefire-reports/*.xml'
+            archive '**/target/*.jar'
+        }
+       }
+}
