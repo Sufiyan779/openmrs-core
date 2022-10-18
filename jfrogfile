@@ -2,7 +2,7 @@ pipeline {
        agent { label 'OEENJDK-11-1' }
        parameters {
            string(name: 'MAVEN_GOAL', defaultValue: 'mvn package', description: 'To build maven')
-           choice(name: 'BRACH_TO_BUILD', choices: ['main', 'VER_1'], description: 'Choose the branch')
+           choice(name: 'SPRINT_1_DEV', choices: ['main', 'SPRINT_1_DEV'], description: 'Choose the branch')
                   }
        triggers {
            pollSCM ('* * * * *')
@@ -14,8 +14,7 @@ pipeline {
                    body: "Build Started for Jenkins JOB $env.JOB_NAME",
                    to: 'khansufiyan779@gmail.com'
               git url: 'https://github.com/Sufiyan779/openmrs-core.git',
-              branch: 'SPRINT_1_DEV'',
-              branch: "${params.BRACH_TO_BUILD}"
+              branch: "${params.SPRINT_1_DEV}"
                 }
                            }
             stage ('artifactory') 
