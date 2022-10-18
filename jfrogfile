@@ -1,5 +1,5 @@
 pipeline {
-       agent { label 'OEENJDK-11-1' }
+       agent { label 'OPENJDK-11-3' }
        parameters {
            string(name: 'MAVEN_GOAL', defaultValue: 'mvn package', description: 'To build maven')
            choice(name: 'SPRINT_1_DEV', choices: ['main', 'SPRINT_1_DEV'], description: 'Choose the branch')
