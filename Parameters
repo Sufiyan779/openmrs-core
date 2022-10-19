@@ -8,7 +8,8 @@ pipeline {
     stages {
         stage('vcs') {
             steps {
-                git branch: "${params.BRANCH_TO_BUILD}", url: 'https://github.com/Sufiyan779/openmrs-core.git'
+                git branch: 'SPRINT_1_DEV', url: 'https://github.com/Sufiyan779/openmrs-core.git'
+                git branch: '${params.BRANCH_TO_BUILD}', url: 'https://github.com/Sufiyan779/openmrs-core.git'
             }
 
         }
