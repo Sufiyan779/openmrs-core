@@ -1,0 +1,28 @@
+pipeline {
+    agent  { label 'OPENJDK-11-1' }
+    parameters {
+        choice(name: 'BRANCH_TO_BUILD', choices: ['SPRINT_1_DEV', 'SPRINT_1_REL'], description: 'Branch to build')
+        string(name: 'MAVEN_GOAL', defaultValue: 'package', description: 'maven goal')
+
+    }
+    stages {
+        stage('vcs') {
+            steps {
+                git branch: 'SPRINT_1_DEV', url: 'https://github.com/Sufiyan779/openmrs-core.git'
+                git branch: "${params.BRANCH_TO_BUILD}", url: 'https://github.com/Sufiyan779/openmrs-core.git'
+            }
+
+        }
+        stage('build') {
+            steps {
+                sh '/opt/apache-maven-3.8.6/bin/mvn package'
+                sh "/opt/apache-maven-3.8.6/bin/mvn ${params.MAVEN_GOAL}"
+            }
+        }
+        stage('archive results') {
+            steps {
+                junit '**/surefire-reports/*.xml'
+            }
+        }
+    }
+}
