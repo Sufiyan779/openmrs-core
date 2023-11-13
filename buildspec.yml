@@ -5,22 +5,22 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - aws --version
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 630821935719.dkr.ecr.us-east-1.amazonaws.com/k8s
-      - REPOSITORY_URI=630821935719.dkr.ecr.us-east-1.amazonaws.com.k8s
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 630821935719.dkr.ecr.us-east-1.amazonaws.com
+      - REPOSITORY_URI=630821935719.dkawsr.ecr.us-east-1.amazonaws.com.k8s
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:latest .
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+      - docker build -t k8s .     # $REPOSITORY_URI:latest .
+      - docker tag k8s:latest 630821935719.dkr.ecr.us-east-1.amazonaws.com/k8s:latest #docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker images...
-      - docker push $REPOSITORY_URI:latest
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - docker push 630821935719.dkr.ecr.us-east-1.amazonaws.com/k8s:latest #$REPOSITORY_URI:latest
+     # - docker push $REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions file...
       - printf '[{"name":"k8s","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 artifacts:
